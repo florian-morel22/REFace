@@ -257,7 +257,10 @@ def crop_faces_by_quads(IMAGE_SIZE, files, quads):
     crops = []
     for quad,  path in tqdm(zip(quads, files), total=len(quads)):
         crop = crop_image(path, IMAGE_SIZE, quad.copy())
-        orig_image = Image.open(path)
+        if isinstance(path, Image.Image):
+            orig_image = path
+        else:
+            orig_image = Image.open(path)
         orig_images.append(orig_image)
         crops.append(crop)
     return crops, orig_images
