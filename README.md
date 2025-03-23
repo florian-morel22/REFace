@@ -2,7 +2,7 @@
 
 This repo is a fork of the original repo : https://github.com/Sanoojan/REFace.git
 
-As part of a project on deepfake generation and detection, I worked on understanding and adapting the REFace model. The majority of my work can be found in the ou_work folder at the root of the project.
+As part of a project on deepfake generation and detection, I worked on understanding and adapting the REFace model. The majority of my work can be found in the /our_work folder at the root of the project.
 
 The goal of the global project is the generation of a deepfake dataset through different technologies, Diffusion, GAN and VQVAE in order to train a deepfake detector. You can find the global repository heare : https://github.com/florian-morel22/deepfake-project.git
 
