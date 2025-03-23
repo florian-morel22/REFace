@@ -584,6 +584,7 @@ class LatentDiffusion(DDPM):
                  conditioning_key=None,
                  scale_factor=1.0,
                  scale_by_std=False,
+                 dlib_landmark_path="Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat",
                  *args, **kwargs):
         self.num_timesteps_cond = default(num_timesteps_cond, 1)
         self.scale_by_std = scale_by_std
@@ -705,7 +706,8 @@ class LatentDiffusion(DDPM):
             
         if self.Landmark_cond or self.Landmark_loss_weight>0:
             self.detector = dlib.get_frontal_face_detector()
-            self.predictor = dlib.shape_predictor("Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat")
+            # self.predictor = dlib.shape_predictor("Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat")
+            self.predictor = dlib.shape_predictor(dlib_landmark_path)
             if self.Landmark_loss_weight>0:
                 # from 640 channels 64 by 64 to 1 channel 64 by 64
                 self.landmark_predictor=LandmarkDetectionModel()

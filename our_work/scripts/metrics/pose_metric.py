@@ -1,22 +1,18 @@
 import os
-
-import numpy as np
 import torch
-import torchvision.transforms as TF
-from PIL import Image
+import numpy as np
+import torchvision
 import torch.nn.functional as F
+import torchvision.transforms as TF
 import eval_tool.face_vid2vid.modules.hopenet as hopenet1
-from torchvision import models
 
+from tqdm import tqdm
+from PIL import Image
+from dotenv import load_dotenv
+from torchvision import models
 from datasets import load_dataset, Dataset
 
-import torchvision
-from tqdm import tqdm
-from dotenv import load_dotenv
-# from inception import InceptionV3
-
 load_dotenv()
-
 
 class PoseDataset(torch.utils.data.Dataset):
     def __init__(
@@ -41,6 +37,7 @@ class PoseDataset(torch.utils.data.Dataset):
         id_target = self.hf_dataset[i]["id_target"]
 
         img_swapped = self.hf_dataset[i]["image"]
+        img_swapped = img_swapped.convert('RGB')
         img_target = Image.open(os.path.join(self.celeba_path, id_target+".jpg")).convert('RGB')
 
         img_swapped = self.transform_hopenet(img_swapped)
@@ -52,7 +49,7 @@ def headpose_pred_to_degree(pred):
     device = pred.device
     idx_tensor = [idx for idx in range(66)]
     idx_tensor = torch.FloatTensor(idx_tensor).to(device)
-    pred = F.softmax(pred)
+    pred = F.softmax(pred, dim=1)
     degree = torch.sum(pred*idx_tensor, axis=1) * 3 - 99
 
     return degree
@@ -82,11 +79,11 @@ class PoseMetric():
             self,
             hf_dataset: Dataset,
             local_celeba_path: str,
-            model: str,
+            model: str=None,
         ):
 
-        hf_dataset = hf_dataset.filter(lambda x: x["model"]==model)
-        local_celeba_path = local_celeba_path
+        if model is not None:
+            hf_dataset = hf_dataset.filter(lambda x: x["model"]==model)
 
         dataset = PoseDataset(
             hf_dataset,

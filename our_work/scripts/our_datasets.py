@@ -14,78 +14,7 @@ from os import path as osp
 from src.utils.alignmengt import crop_faces, calc_alignment_coefficients, crop_faces_from_image
 from pretrained.face_parsing.face_parsing_demo import init_faceParsing_pretrained_model, faceParsing_demo
 
-
-
-# 1:skin, 2:nose, 3:eye_g, 4:l_eye, 5:r_eye, 6:l_brow, 7:r_brow, 8:l_ear, 9:r_ear, 
-# 10:mouth, 11:u_lip, 12:l_lip, 13:hair, 14:hat, 15:ear_r, 16:neck_l, 17:neck, 18:cloth
-# preserve=[1,2,4,5,8,9,17 ] #comes from source
-preserve = [1,2,4,5,8,9, 6,7,10,11,12]
-
-
-#FFHQ/ faceparcing network
-# 0:background, 1:lip, 2:eyebrows, 3:eyes, 4:hair, 5:nose, 6:skin, 7:ears, 
-# 8:belowface, 9:mouth, 10:eye_glass, 11:ear_rings
-preserve = [1,2,3,5,6,7,9]
-def bbox_process(bbox):
-    x_min = int(bbox[0])
-    y_min = int(bbox[1])
-    x_max = x_min + int(bbox[2])
-    y_max = y_min + int(bbox[3])
-    return list(map(int, [x_min, y_min, x_max, y_max]))
-
-
-def get_tensor(normalize=True, toTensor=True):
-    transform_list = []
-    if toTensor:
-        transform_list += [torchvision.transforms.ToTensor()]
-
-    if normalize:
-        transform_list += [torchvision.transforms.Normalize((0.5, 0.5, 0.5),
-                                                (0.5, 0.5, 0.5))]
-    return torchvision.transforms.Compose(transform_list)
-
-def get_tensor_clip(normalize=True, toTensor=True):
-    transform_list = []
-    if toTensor:
-        transform_list += [torchvision.transforms.ToTensor()]
-
-    if normalize:
-        transform_list += [torchvision.transforms.Normalize((0.48145466, 0.4578275, 0.40821073),
-                                                (0.26862954, 0.26130258, 0.27577711))]
-    return torchvision.transforms.Compose(transform_list)
-
-def crop_and_align_face(target_files):
-    image_size = 1024
-    scale = 1.0
-    center_sigma = 0
-    xy_sigma = 0
-    use_fa = False
-
-    crops, orig_images, quads = crop_faces(image_size, target_files, scale, center_sigma=center_sigma, xy_sigma=xy_sigma, use_fa=use_fa)
-    
-    inv_transforms = [
-        calc_alignment_coefficients(quad + 0.5, [[0, 0], [0, image_size], [image_size, image_size], [image_size, 0]])
-        for quad in quads
-    ]
-    
-    return crops, orig_images, quads, inv_transforms
-
-def crop_and_align_face_img(frame):
-    image_size = 1024
-    scale = 1.0
-    center_sigma = 0
-    xy_sigma = 0
-    use_fa = False
-    
-    print('Aligning images')
-    crops, orig_images, quads = crop_faces_from_image(image_size, frame, scale, center_sigma=center_sigma, xy_sigma=xy_sigma, use_fa=use_fa)
-    
-    inv_transforms = [
-        calc_alignment_coefficients(quad + 0.5, [[0, 0], [0, image_size], [image_size, image_size], [image_size, 0]])
-        for quad in quads
-    ]
-    
-    return crops, orig_images, quads, inv_transforms
+from our_work.scripts.utils import get_tensor, crop_and_align_face, get_tensor_clip
 
 
 class OurCelebADataset(data.Dataset):

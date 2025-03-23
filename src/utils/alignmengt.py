@@ -14,7 +14,6 @@ from tqdm import tqdm
 import cv2
 import dlib
 
-
 def rect_to_bb(rect):
 	# take a bounding predicted by dlib and convert it
 	# to the format (x, y, w, h) as we would normally do
@@ -178,7 +177,7 @@ def compute_transform(filepath, predictor, detector=None, scale=1.0, fa=None):
     return c, x, y
 
 
-def crop_faces(IMAGE_SIZE, files, scale, center_sigma=0.0, xy_sigma=0.0, use_fa=False):
+def crop_faces(IMAGE_SIZE, files, scale, dlib_landmark_path: str = "Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat", center_sigma=0.0, xy_sigma=0.0, use_fa=False):
     if use_fa:
         import face_alignment
         fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=True)
@@ -187,7 +186,8 @@ def crop_faces(IMAGE_SIZE, files, scale, center_sigma=0.0, xy_sigma=0.0, use_fa=
     else:
         # import dlib
         fa = None
-        predictor = dlib.shape_predictor("Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat")
+        # predictor = dlib.shape_predictor("Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat")
+        predictor = dlib.shape_predictor(dlib_landmark_path)
         detector = dlib.get_frontal_face_detector()
 
     cs, xs, ys = [], [], []
@@ -215,7 +215,7 @@ def crop_faces(IMAGE_SIZE, files, scale, center_sigma=0.0, xy_sigma=0.0, use_fa=
 
     return crops, orig_images, quads
 
-def crop_faces_from_image(IMAGE_SIZE, frame, scale, center_sigma=0.0, xy_sigma=0.0, use_fa=False):
+def crop_faces_from_image(IMAGE_SIZE, frame, scale, dlib_landmark_path, center_sigma=0.0, xy_sigma=0.0, use_fa=False):
     if use_fa:
         import face_alignment
         fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=True)
@@ -224,7 +224,8 @@ def crop_faces_from_image(IMAGE_SIZE, frame, scale, center_sigma=0.0, xy_sigma=0
     else:
         import dlib
         fa = None
-        predictor = dlib.shape_predictor("Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat")
+        #predictor = dlib.shape_predictor("Other_dependencies/DLIB_landmark_det/shape_predictor_68_face_landmarks.dat")
+        predictor = dlib.shape_predictor(dlib_landmark_path)
         detector = dlib.get_frontal_face_detector()
 
     cs, xs, ys = [], [], []

@@ -1,6 +1,6 @@
 from huggingface_hub import hf_hub_download
 
-print(">> Download usefull models :")
+print(">> Download useful models :")
 
 hf_hub_download(repo_id="Sanoojan/REFace", filename="last.ckpt", local_dir="./models/REFace/checkpoints")
 hf_hub_download(repo_id="Sanoojan/REFace", filename="Other_dependencies/arcface/model_ir_se50.pth", local_dir=".")

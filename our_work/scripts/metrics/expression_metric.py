@@ -1,25 +1,11 @@
 import os
-import pathlib
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
-
-import numpy as np
 import torch
-import torchvision.transforms as TF
+import numpy as np
+
 from PIL import Image
-import re
-from scipy import linalg
-from torch.nn.functional import adaptive_avg_pool2d
-import torch.nn.functional as F
-import eval_tool.face_vid2vid.modules.hopenet as hopenet1
-from torchvision import models
-
-from datasets import load_dataset, Dataset
-
-import torchvision
 from tqdm import tqdm
 from dotenv import load_dotenv
-# from inception import InceptionV3
-
+from datasets import load_dataset, Dataset
 from eval_tool.Deep3DFaceRecon_pytorch_edit.options.test_options import TestOptions
 from eval_tool.Deep3DFaceRecon_pytorch_edit.models import create_model
 
@@ -48,6 +34,7 @@ class ExpressionDataset(torch.utils.data.Dataset):
         id_target = self.hf_dataset[i]["id_target"]
 
         img_swapped: Image.Image = self.hf_dataset[i]["image"]
+        img_swapped = img_swapped.convert('RGB')
         img_target = Image.open(os.path.join(self.celeba_path, id_target+".jpg")).convert('RGB')
 
         img_swapped = img_swapped.resize((512, 512), Image.BICUBIC)
@@ -82,11 +69,11 @@ class ExpressionMetric():
             self,
             hf_dataset: Dataset,
             local_celeba_path: str,
-            model: str,
+            model: str=None,
         ):
 
-        hf_dataset = hf_dataset.filter(lambda x: x["model"]==model)
-        local_celeba_path = local_celeba_path
+        if model is not None:
+            hf_dataset = hf_dataset.filter(lambda x: x["model"]==model)
 
         dataset = ExpressionDataset(
             hf_dataset,
